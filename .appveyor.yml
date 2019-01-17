@@ -8,9 +8,11 @@ configuration:  # a trick to construct a build matrix with multiple Python versi
 environment:
   matrix:
     - COMPILER: MSVC
-    - COMPILER: MINGW
 
 clone_depth: 50
+
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   - git submodule update --init --recursive  # get `compute` folder
@@ -55,3 +57,6 @@ test_script:
   - cd %APPVEYOR_BUILD_FOLDER%\examples\python-guide\notebooks
   - conda install -y -n test-env ipywidgets notebook
   - jupyter nbconvert --ExecutePreprocessor.timeout=180 --to notebook --execute --inplace *.ipynb  # run all notebooks
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
